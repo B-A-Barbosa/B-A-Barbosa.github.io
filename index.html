@@ -4,11 +4,17 @@
 <meta charset="UTF-8">
 <title>Alien Game</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #eee; text-align: center; }
-  #game { position: relative; width: 600px; height: 600px; margin: auto; background: #fff; border: 2px solid #333; }
-  #alien, #boom, #poop, .action { position: absolute; cursor: pointer; }
-  #stats { position: absolute; top: 10px; left: 10px; text-align: left; }
-  #startBtn { margin: 20px; padding: 10px 20px; font-size: 18px; }
+  body { font-family: Arial, sans-serif; background:#eee; text-align:center; }
+  #game { position: relative; width:600px; height:600px; margin:auto; background:#fff; border:2px solid #333; }
+  #stats { position:absolute; top:10px; left:10px; text-align:left; }
+  #alien, #boom, #poop { position:absolute; }
+  #boom { top:0; left:0; display:none; }
+  #poop { top:100px; left:250px; display:none; }
+  #alien { top:26px; left:250px; }
+  .bottom-bar { position:absolute; bottom:0; left:0; width:100%; display:flex; justify-content:flex-start; }
+  .bottom-bar img { margin:0; cursor:pointer; }
+  #burger { position:absolute; bottom:120px; left:300px; cursor:pointer; }
+  #startBtn { margin:20px; padding:10px 20px; font-size:18px; }
 </style>
 </head>
 <body>
@@ -23,110 +29,87 @@
     <div id="dirty">Dirty: 0</div>
     <div id="happy">Happiness: 100</div>
   </div>
-  <img id="alien" src="alien.png" style="top:26px; left:250px;">
-  <img id="boom" src="boom.png" style="top:0; left:0; display:none;">
-  <img id="poop" src="poop.png" style="top:100px; left:250px; display:none;">
-  <img id="park" class="action" src="park.png" style="bottom:0; left:0;">
-  <img id="shower" class="action" src="shower.png" style="bottom:0; left:100px;">
-  <img id="bed" class="action" src="bed.jpg" style="bottom:0; left:200px;">
-  <img id="burger" class="action" src="burger.png" style="bottom:100px; left:200px;">
+  <img id="alien" src="alien.png">
+  <img id="boom" src="boom.png">
+  <img id="poop" src="poop.png">
+  
+  <!-- bottom row of actions -->
+  <div class="bottom-bar">
+    <img id="park" src="park.png">
+    <img id="shower" src="shower.png">
+    <img id="bed" src="bed.jpg">
+  </div>
+  <!-- burger sits above bed like in original -->
+  <img id="burger" src="burger.png">
 </div>
 
 <script>
-let hunger = 0, sleep = 0, bored = 0, dirty = 0, happy = 100;
-let flag = false, poopFlag = false;
-let timer;
+let hunger=0,sleep=0,bored=0,dirty=0,happy=100;
+let flag=false,poopFlag=false,timer;
 
-function updateStats() {
-  document.getElementById("hunger").textContent = "Hunger: " + hunger;
-  document.getElementById("sleep").textContent = "Tiredness: " + sleep;
-  document.getElementById("bored").textContent = "Boredom: " + bored;
-  document.getElementById("dirty").textContent = "Dirty: " + dirty;
-  happy = 100 - Math.floor((hunger + sleep + bored + dirty) / 4);
-  document.getElementById("happy").textContent = "Happiness: " + happy;
-
-  if (happy <= 50 || hunger >= 100 || sleep >= 100 || bored >= 100 || dirty >= 100) {
-    if (!flag) {
-      // play explode sound here if desired
-      flag = true;
-    }
-    document.getElementById("boom").style.display = "block";
+function updateStats(){
+  document.getElementById("hunger").textContent="Hunger: "+hunger;
+  document.getElementById("sleep").textContent="Tiredness: "+sleep;
+  document.getElementById("bored").textContent="Boredom: "+bored;
+  document.getElementById("dirty").textContent="Dirty: "+dirty;
+  happy=100-Math.floor((hunger+sleep+bored+dirty)/4);
+  document.getElementById("happy").textContent="Happiness: "+happy;
+  if(happy<=50||hunger>=100||sleep>=100||bored>=100||dirty>=100){
+    if(!flag){ flag=true; /* play explode sound here */ }
+    document.getElementById("boom").style.display="block";
   }
   checkPoop();
 }
-
-function handleAdd(val, inc) {
-  return val + inc <= 100 ? val + inc : 100;
-}
-
-function checkPoop() {
-  if (dirty >= 50) {
-    document.getElementById("poop").style.display = "block";
-    if (!poopFlag) {
-      poopFlag = true;
-      // play fart sound here
-    }
+function handleAdd(val,inc){ return val+inc<=100?val+inc:100; }
+function checkPoop(){
+  if(dirty>=50){
+    document.getElementById("poop").style.display="block";
+    if(!poopFlag){ poopFlag=true; /* fart sound */ }
   } else {
-    poopFlag = false;
-    document.getElementById("poop").style.display = "none";
+    poopFlag=false;
+    document.getElementById("poop").style.display="none";
   }
 }
-
-function rollAlien() {
-  let alien = document.getElementById("alien");
-  let r = Math.floor(Math.random() * 100) + 1;
-  if (r <= 3) alien.src = "bestAlien.png";
-  else if (r <= 6) alien.src = "gloriousAlien.jpg";
+function rollAlien(){
+  let alien=document.getElementById("alien");
+  let r=Math.floor(Math.random()*100)+1;
+  if(r<=3) alien.src="bestAlien.png";
+  else if(r<=6) alien.src="gloriousAlien.jpg";
   else {
-    let c = Math.floor(Math.random() * 4) + 1;
-    if (c === 2) alien.src = "blueAlien2.png";
-    else if (c === 3) alien.src = "redAlien2.png";
-    else if (c === 4) alien.src = "greenAlien2.png";
-    else alien.src = "alien.png";
+    let c=Math.floor(Math.random()*4)+1;
+    if(c===2) alien.src="blueAlien2.png";
+    else if(c===3) alien.src="redAlien2.png";
+    else if(c===4) alien.src="greenAlien2.png";
+    else alien.src="alien.png";
   }
 }
 
-document.getElementById("startBtn").addEventListener("click", () => {
+document.getElementById("startBtn").addEventListener("click",()=>{
   rollAlien();
-  if (timer) clearInterval(timer);
-  timer = setInterval(() => {
-    let r = Math.floor(Math.random() * 5);
-    if (r === 0) hunger = handleAdd(hunger, 1);
-    else if (r === 1) sleep = handleAdd(sleep, 1);
-    else if (r === 2) bored = handleAdd(bored, 1);
-    else if (r === 3) dirty = handleAdd(dirty, document.getElementById("poop").style.display === "block" ? 3 : 1);
+  if(timer) clearInterval(timer);
+  timer=setInterval(()=>{
+    let r=Math.floor(Math.random()*5);
+    if(r===0) hunger=handleAdd(hunger,1);
+    else if(r===1) sleep=handleAdd(sleep,1);
+    else if(r===2) bored=handleAdd(bored,1);
+    else if(r===3) dirty=handleAdd(dirty,document.getElementById("poop").style.display==="block"?3:1);
     updateStats();
-  }, 500); // slower than 30ms for browser
+  },500);
 });
 
-// Actions
-document.getElementById("shower").addEventListener("click", () => {
-  dirty = 0;
-  sleep = handleAdd(sleep, 10);
-  bored = handleAdd(bored, 5);
-  updateStats();
+document.getElementById("shower").addEventListener("click",()=>{
+  dirty=0; sleep=handleAdd(sleep,10); bored=handleAdd(bored,5); updateStats();
 });
-
-document.getElementById("park").addEventListener("click", () => {
-  dirty = handleAdd(dirty, 10);
-  bored = 0;
-  hunger = handleAdd(hunger, 5);
-  updateStats();
+document.getElementById("park").addEventListener("click",()=>{
+  dirty=handleAdd(dirty,10); bored=0; hunger=handleAdd(hunger,5); updateStats();
 });
-
-document.getElementById("bed").addEventListener("click", () => {
-  sleep = 0;
-  hunger = handleAdd(hunger, 10);
-  updateStats();
+document.getElementById("bed").addEventListener("click",()=>{
+  sleep=0; hunger=handleAdd(hunger,10); updateStats();
 });
-
-document.getElementById("burger").addEventListener("click", () => {
-  hunger = 0;
-  dirty = handleAdd(dirty, 5);
-  updateStats();
+document.getElementById("burger").addEventListener("click",()=>{
+  hunger=0; dirty=handleAdd(dirty,5); updateStats();
 });
 </script>
 
 </body>
 </html>
-
